@@ -29,6 +29,14 @@ export class UsersService {
     return this.userModel.findByPk(id);
   }
 
+  findByEmail(email: string) {
+    return this.userModel.findOne({ where: { email } });
+  }
+
+  findByToken(refresh_token: string) {
+    return this.userModel.findOne({ where: { refresh_token } });
+  }
+
   async update(id: number, updateUserDto: UpdateUserDto) {
     const user = await this.userModel.findByPk(id);
     if (!user) {

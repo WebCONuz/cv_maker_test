@@ -141,7 +141,7 @@ export class User extends Model<User, IUserCreationAttr> {
     description: "Foydalanuvchi statusi",
   })
   @Column({
-    type: DataType.STRING,
+    type: DataType.BOOLEAN,
     allowNull: false,
     defaultValue: false,
   })
@@ -149,4 +149,24 @@ export class User extends Model<User, IUserCreationAttr> {
 
   @BelongsTo(() => Role)
   role: Role;
+
+  @ApiProperty({
+    example: true,
+    description: "Foydalanuvchi refresh tokeni",
+  })
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  declare refresh_token: string;
+
+  @ApiProperty({
+    example: true,
+    description: "Foydalanuvchi refresh tokeni",
+  })
+  @Column({
+    type: DataType.UUID,
+    defaultValue: DataType.UUIDV4(),
+  })
+  declare activate_link: string;
 }

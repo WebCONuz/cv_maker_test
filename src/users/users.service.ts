@@ -47,6 +47,23 @@ export class UsersService {
     return user[1][0];
   }
 
+  async activate(link: string) {
+    const updatedUser = await this.userModel.update(
+      { is_active: true },
+      {
+        where: {
+          activate_link: link,
+          is_active: false,
+        },
+        returning: true,
+      }
+    );
+    if (!updatedUser[1][0]) {
+      throw new BadRequestException("User allaqachon aktivatsiya qilgan");
+    }
+    return updatedUser[1][0];
+  }
+
   async remove(id: number) {
     const user = await this.userModel.destroy({ where: { id } });
     if (user) {

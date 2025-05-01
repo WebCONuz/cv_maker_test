@@ -10,18 +10,21 @@ import { CreateUserDto } from "../users/dto/create-user.dto";
 import { SignInDto } from "./dto/sign-in.dto";
 import * as bcrypt from "bcrypt";
 import { Request, Response } from "express";
+import { MailService } from "../mail/mail.service";
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly usersService: UsersService,
-    readonly jwtService: JwtService
+    private readonly emailService: MailService,
+    private readonly jwtService: JwtService
   ) {}
 
   async signup(createUserDto: CreateUserDto) {
     const newUser = await this.usersService.create(createUserDto);
 
     // emailga ctivate link yuboriladi
+    await this.emailService.sendMail(newUser);
 
     return {
       success: true,
@@ -57,6 +60,17 @@ export class AuthService {
     };
   }
 
+  async activateUser(link: string) {
+    if (!link) {
+      throw new BadRequestException("activation link yo'q");
+    }
+    const updatedUser = await this.usersService.activate(link);
+    return {
+      message: "Foydalanuvchi muvaffaqiyatli aktivatsiyadan o'tdi",
+      is_active: updatedUser.is_active,
+    };
+  }
+
   async signuot(req: Request, res: Response) {
     const refresh_token = req.cookies.refresh_token;
     if (!refresh_token) {
@@ -76,6 +90,35 @@ export class AuthService {
     return {
       success: true,
       message: "Signed out successfully",
+    };
+  }
+
+  async refreshToken(req: Request, res: Response) {
+    const refreshToken = req.cookies.refresh_token;
+    if (!refreshToken) {
+      throw new UnauthorizedException("Ro'yxatdan o'tmagan");
+    }
+    const decoded_token = await this.jwtService.verify(refreshToken, {
+      secret: process.env.REFRESH_TOKEN_KEY,
+    });
+
+    const user = await this.usersService.findOne(+decoded_token.id);
+    if (!user) {
+      throw new BadRequestException("Token topilmadi");
+    }
+
+    const { access_token, refresh_token } = await this.generateTokens(user);
+    user.refresh_token = refresh_token;
+    await user.save();
+
+    res.cookie("refresh_token", refresh_token, {
+      maxAge: Number(process.env.COOKIE_REFRESH_TIME),
+      httpOnly: true,
+    });
+    return {
+      success: true,
+      message: "Tokenlar yangilandi!",
+      access_token,
     };
   }
 

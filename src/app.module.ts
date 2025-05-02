@@ -6,10 +6,20 @@ import { Role } from "./roles/models/role.model";
 import { User } from "./users/models/user.model";
 import { UsersModule } from "./users/users.module";
 import { AuthModule } from "./auth/auth.module";
-import { MailModule } from './mail/mail.module';
+import { MailModule } from "./mail/mail.module";
+import { BotModule } from "./bot/bot.module";
+import { TelegrafModule } from "nestjs-telegraf";
 
 @Module({
   imports: [
+    TelegrafModule.forRootAsync({
+      botName: "cv_maker",
+      useFactory: () => ({
+        token: process.env.TELEGRAM_BOT_TOKEN!,
+        include: [BotModule],
+        middlewares: [],
+      }),
+    }),
     ConfigModule.forRoot({ envFilePath: ".env", isGlobal: true }),
     SequelizeModule.forRoot({
       dialect: "postgres",
@@ -27,6 +37,7 @@ import { MailModule } from './mail/mail.module';
     UsersModule,
     AuthModule,
     MailModule,
+    BotModule,
   ],
   controllers: [],
   providers: [],

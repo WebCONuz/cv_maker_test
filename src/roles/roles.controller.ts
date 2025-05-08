@@ -18,7 +18,7 @@ import {
 } from "@nestjs/swagger";
 import { Role } from "./models/role.model";
 
-@Controller("roles")
+@Controller("role")
 export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
 
@@ -40,6 +40,8 @@ export class RolesController {
   @ApiOkResponse({ description: "Bitta rol" })
   @Get(":id")
   findOne(@Param("id") id: string) {
+    console.log(id);
+
     return this.rolesService.findOne(+id);
   }
 

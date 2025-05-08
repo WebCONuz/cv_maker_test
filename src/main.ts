@@ -17,7 +17,7 @@ async function start() {
     app.use(cookieParser());
 
     // global validation
-    app.useGlobalPipes(new ValidationPipe());
+    app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
     // global prefix
     app.setGlobalPrefix("api");

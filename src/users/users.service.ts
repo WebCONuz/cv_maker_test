@@ -8,17 +8,28 @@ import { UpdateUserDto } from "./dto/update-user.dto";
 import * as bcrypt from "bcrypt";
 import { InjectModel } from "@nestjs/sequelize";
 import { User } from "./models/user.model";
+import { MediaService } from "../media/media.service";
+import { FileService } from "../file/file.service";
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User) private readonly userModel: typeof User) {}
+  constructor(
+    @InjectModel(User) private readonly userModel: typeof User,
+    private readonly fileService: FileService,
+    private readonly mediaService: MediaService
+  ) {}
 
-  async create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto, avatar: any) {
     const hashshed_password = await bcrypt.hashSync(createUserDto.password, 7);
-    return this.userModel.create({
+    const media_id = await this.mediaService.create(avatar);
+
+    const user = await this.userModel.create({
       ...createUserDto,
       password: hashshed_password,
+      media_id,
     });
+
+    return user;
   }
 
   findAll() {

@@ -20,15 +20,20 @@ export class AuthService {
     private readonly jwtService: JwtService
   ) {}
 
-  async signup(createUserDto: CreateUserDto) {
-    const newUser = await this.usersService.create(createUserDto);
+  async signup(createUserDto: CreateUserDto, avatar: any) {
+    const user = await this.usersService.findByEmail(createUserDto.email);
+    if (user) {
+      throw new BadRequestException("Bu Email allaqachon bazada mavjud");
+    }
+
+    const newUser = await this.usersService.create(createUserDto, avatar);
 
     // emailga ctivate link yuboriladi
     await this.emailService.sendMail(newUser);
 
     return {
       success: true,
-      message: "Sign up successfully",
+      message: "Sign up successfully, Your activate link sent to your email",
     };
   }
 
@@ -41,6 +46,13 @@ export class AuthService {
     const compared = await bcrypt.compare(signInDto.password, user.password);
     if (!compared) {
       throw new BadRequestException("Email yoki parol xato");
+    }
+
+    if (!user.is_active) {
+      await this.emailService.sendMail(user);
+      throw new BadRequestException(
+        "Sizning holatingiz active emas, Emailingizga yuborilgan orqali Profilingizni aktivlashtiring"
+      );
     }
 
     const { access_token, refresh_token } = await this.generateTokens(user);

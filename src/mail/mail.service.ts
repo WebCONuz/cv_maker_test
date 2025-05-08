@@ -10,7 +10,7 @@ export class MailService {
     await this.mailerService.sendMail({
       to: user.email,
       subject: "Welcome to cv-maker app",
-      template: "./confirm",
+      template: "confirm",
       context: {
         first_name: user.first_name,
         link: `${process.env.DOMEN}/api/auth/activate/${user.activate_link}`,

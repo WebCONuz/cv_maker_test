@@ -8,6 +8,7 @@ import {
   Table,
 } from "sequelize-typescript";
 import { Role } from "../../roles/models/role.model";
+import { Media } from "../../media/models/media.model";
 
 interface IUserCreationAttr {
   first_name: string;
@@ -20,6 +21,7 @@ interface IUserCreationAttr {
   password: string;
   about_text: string;
   role_id: number;
+  media_id: number;
 }
 
 @Table({ tableName: "users" })
@@ -102,6 +104,7 @@ export class User extends Model<User, IUserCreationAttr> {
   @Column({
     type: DataType.STRING,
     allowNull: false,
+    unique: true,
   })
   declare email: string;
 
@@ -169,4 +172,13 @@ export class User extends Model<User, IUserCreationAttr> {
     defaultValue: DataType.UUIDV4(),
   })
   declare activate_link: string;
+
+  @ForeignKey(() => Media)
+  @Column({
+    type: DataType.INTEGER,
+  })
+  media_id: number;
+
+  @BelongsTo(() => Media)
+  profilePicture: Media;
 }

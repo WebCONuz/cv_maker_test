@@ -1,8 +1,8 @@
-import { Column, DataType, Model, Table } from "sequelize-typescript";
+import { Column, DataType, HasOne, Model, Table } from "sequelize-typescript";
+import { User } from "../../users/models/user.model";
 
 interface IMediaCreationAttr {
   media_name: string;
-  table_name: string;
   is_active: boolean;
 }
 
@@ -22,14 +22,11 @@ export class Media extends Model<Media, IMediaCreationAttr> {
   media_name: string;
 
   @Column({
-    type: DataType.STRING,
-    allowNull: false,
-  })
-  table_name: string;
-
-  @Column({
     type: DataType.BOOLEAN,
     allowNull: false,
   })
   is_active: boolean;
+
+  @HasOne(() => User)
+  user: User;
 }

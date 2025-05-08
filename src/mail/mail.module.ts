@@ -21,9 +21,8 @@ import { join } from "path";
           from: `CV_MAKER ${config.get<string>("SMTP_HOST")}`,
         },
         template: {
-          dir: join(__dirname, "templates"),
+          dir: join(process.cwd(), "src/mail/templates"),
           adapter: new HandlebarsAdapter(),
-          template: "confirm",
           options: {
             strict: true,
           },

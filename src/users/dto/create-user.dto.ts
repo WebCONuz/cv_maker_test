@@ -8,6 +8,7 @@ import {
   IsOptional,
 } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
+import { Type } from "class-transformer";
 
 export class CreateUserDto {
   @ApiProperty({
@@ -93,6 +94,16 @@ export class CreateUserDto {
     example: 2,
     description: "Foydalanuvchining roli IDsi",
   })
+  @Type(() => Number)
   @IsNumber({}, { message: "role_id raqam bo'lishi kerak" })
   role_id: number;
+
+  @ApiProperty({
+    example: 2,
+    description: "Foydalanuvchining media id",
+  })
+  @Type(() => Number)
+  @IsNumber({}, { message: "media_id raqam bo'lishi kerak" })
+  @IsOptional()
+  media_id: number;
 }

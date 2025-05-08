@@ -24,9 +24,13 @@ import { Experience } from "./experience/models/experience.model";
 import { Education } from "./education/models/education.model";
 import { SocialMedia } from "./social_media/models/social_media.model";
 import { Media } from "./media/models/media.model";
+import { FileModule } from "./file/file.module";
+import { ServeStaticModule } from "@nestjs/serve-static";
+import { join } from "path";
 
 @Module({
   imports: [
+    // telegram bot
     TelegrafModule.forRootAsync({
       botName: "cv_maker",
       useFactory: () => ({
@@ -35,7 +39,16 @@ import { Media } from "./media/models/media.model";
         middlewares: [],
       }),
     }),
+
+    // env
     ConfigModule.forRoot({ envFilePath: ".env", isGlobal: true }),
+
+    // static folder
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, "..", "public"),
+    }),
+
+    // sequelize
     SequelizeModule.forRoot({
       dialect: "postgres",
       host: process.env.PG_HOST,
@@ -59,6 +72,8 @@ import { Media } from "./media/models/media.model";
       sync: { alter: true },
       logging: false,
     }),
+
+    // modules
     RolesModule,
     UsersModule,
     UserMessageModule,
@@ -72,6 +87,7 @@ import { Media } from "./media/models/media.model";
     SocialMediaModule,
     SocialMediaModule,
     BotModule,
+    FileModule,
   ],
   controllers: [],
   providers: [],

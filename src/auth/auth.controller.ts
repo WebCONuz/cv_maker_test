@@ -1,16 +1,28 @@
-import { Body, Controller, Get, Param, Post, Req, Res } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Req,
+  Res,
+  UploadedFile,
+  UseInterceptors,
+} from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { CreateUserDto } from "../users/dto/create-user.dto";
 import { SignInDto } from "./dto/sign-in.dto";
 import { Response, Request } from "express";
+import { FileInterceptor } from "@nestjs/platform-express";
 
 @Controller("auth")
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post("sign-up")
-  signup(@Body() createUserDto: CreateUserDto) {
-    return this.authService.signup(createUserDto);
+  @UseInterceptors(FileInterceptor("avatar"))
+  signup(@Body() createUserDto: CreateUserDto, @UploadedFile() avatar: any) {
+    return this.authService.signup(createUserDto, avatar);
   }
 
   @Post("sign-in")
